@@ -1,0 +1,60 @@
+﻿@model IEnumerable<CodeLuckManagement.DbFirst.Models.Employee>
+
+@{
+    ViewData["Title"] = "Home Page";
+    var empDepts = ViewBag.Emp_Depts as List<CodeLuckManagement.DbFirst.Models.EmployeesDepartment>;
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>EmpId</th>
+            <th>EmpName</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Date of Birth</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in Model)
+        {
+            <tr>
+                <td>@employee.EmpId</td>
+                <td>@employee.EmpName</td>
+                <td>@employee.Email</td>
+                <td>@employee.Phone</td>
+                <td>@employee.Dob?.ToString("yyyy-MM-dd")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>DepartmentId</th>
+            <th>DepartmentName</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in Model)
+        {
+            @if (employee.EmployeesDepartments != null)
+            {
+                @foreach (var ed in employee.EmployeesDepartments)
+                {
+                    <tr>
+                        <td>@ed.EmpId</td>
+                        <td>@ed.DeptId</td> <!-- Assuming DepartmentName is a property of the Department class -->
+                    </tr>
+                }
+            }
+
+        }
+    </tbody>
+</table>
