@@ -6,6 +6,6 @@ namespace P6.Infrastructure.Repository
     {
         Task<User> GetUserByTokenAsync(string? RefreshToken);
 
-        public Task<User?> GetByEmailAsync(string email);
+        Task<User?> GetByEmailAsync(string email);
     }
 }

@@ -13,12 +13,12 @@ namespace P6.Infrastructure.Repository
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await _context.Users.SingleOrDefaultAsync(user => user.Email == email);
+            return await _context.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
-        public async Task<User> GetUserByTokenAsync(string? RefreshToken)
+        public async Task<User?> GetUserByTokenAsync(string? RefreshToken)
         {
-            return await _context.Users.SingleOrDefaultAsync(user => user.RefreshToken == RefreshToken);
+            return await _context.Users.SingleOrDefaultAsync(user => user.RefreshToken!.Equals(RefreshToken));
         }
     }
 }

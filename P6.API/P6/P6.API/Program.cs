@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using P6.API.Middleware;
+using P6.API.MiddleWare;
 using P6.Application.Abstract;
 using P6.Application.Services;
 using P6.Core.Entities;
@@ -58,8 +60,8 @@ builder.Services.AddAuthentication(options =>
 // add authorize
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("ADMIN"));
+    options.AddPolicy("UserPolicy", policy => policy.RequireRole("USER"));
 });
 
 // CORS
@@ -125,10 +127,17 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 
+//use middleware nên đặt trước chỗ authen, nếu ko đặt trc thì phải dùng app.UseRequestCulture()
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<TokenFromCookies>();
+
+//app.UseRequestCulture();
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+
 
 app.Run();

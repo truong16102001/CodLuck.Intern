@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using P6.Application.Abstract;
 using P6.Application.DTOs;
@@ -10,15 +11,12 @@ namespace P6.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
         private readonly IAuthService _authService;
         readonly ITokenService _tokenService;
-        public AuthController(IUserService userService, IAuthService authService, ITokenService tokenService)
+        public AuthController(IAuthService authService, ITokenService tokenService)
         {
-            _userService = userService;
             _authService = authService;
             _tokenService = tokenService;
-
         }
 
         [HttpPost("signin")]
@@ -28,14 +26,21 @@ namespace P6.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpPost("RefreshToken")]
+        [HttpPost("signup")]
+        public async Task<IActionResult> Signup([FromBody] SignupModel signupModel)
+        {
+            var result = await _authService.SignupServiceAsync(signupModel);
+            return StatusCode((int)result.StatusCode, result);
+        }
+
+        [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken()
         {
             // Get the cookie header
             string cookieHeader = Request.Headers["Cookie"].ToString();
 
             // Parse the cookie header to extract individual cookies
-            var cookies = cookieHeader.Split(',')
+            var cookies = cookieHeader.Split(';')
                                       .Select(cookie => cookie.Split('='))
                                       .ToDictionary(cookie => cookie[0].Trim(), cookie => cookie.Length > 1 ? cookie[1].Trim() : string.Empty);
 
@@ -45,13 +50,14 @@ namespace P6.API.Controllers
             return StatusCode((int)result.StatusCode, result);
         }
 
-        [HttpPost("Logout")]
+        [Authorize]
+        [HttpPost("signout")]
         public async Task<IActionResult> Logout()
         {
             // Get the cookie header
             string cookieHeader = Request.Headers["Cookie"].ToString();
             // Parse the cookie header to extract individual cookies
-            var cookies = cookieHeader.Split(',')
+            var cookies = cookieHeader.Split(';')
                           .Select(cookie => cookie.Trim().Split('='))
                           .ToDictionary(cookie => cookie[0], cookie => Uri.UnescapeDataString(cookie[1]));
 

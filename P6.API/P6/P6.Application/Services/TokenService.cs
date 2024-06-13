@@ -71,7 +71,6 @@ namespace P6.Application.Services
 
         public async Task<TokenResultDTO> JWTGeneratorAsync(User user)
         {
-
             var encrypterToken = GenerateAccessToken(user);
 
             var newRefreshToken = await UpdateUserRefreshTokenAsync(user);
@@ -178,6 +177,28 @@ namespace P6.Application.Services
                 StatusCode = System.Net.HttpStatusCode.NotFound,
                 DevMsg = "There is no user with this token"
             };
+        }
+
+        public Task<ClaimsPrincipal> GetPrincipalFromExpiredTokenAsync(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = _configuration["JWT:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = _configuration["JWT:Audience"],
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]))
+            };
+
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters,
+                out SecurityToken securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+            return Task.FromResult(principal);
         }
     }
 }

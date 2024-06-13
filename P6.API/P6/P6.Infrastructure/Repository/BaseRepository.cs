@@ -17,7 +17,7 @@ namespace P6.Infrastructure.Repository
         {
             _context = codLuckContext;
         }
-        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>> expression = null)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> expression = null)
         {
             if (expression is null)
             {
@@ -35,21 +35,48 @@ namespace P6.Infrastructure.Repository
             await _context.Set<T>().AddAsync(entity);
         }
 
-        public void Update(T entity)
+        public async Task Update(T entity)
         {
             _context.Set<T>().Attach(entity);
             _context.Set<T>().Entry(entity).State = EntityState.Modified;
+            await Task.CompletedTask;
         }
 
-        public void Delete(T entity)
+        public async Task Delete(T entity)
         {
             _context.Set<T>().Attach(entity);
             _context.Set<T>().Entry(entity).State = EntityState.Deleted;
+            await Task.CompletedTask;
         }
 
         public async Task Commit()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task MultipleCreate(IEnumerable<T> entities)
+        {
+            await _context.Set<T>().AddRangeAsync(entities);
+        }
+
+        public async Task MultipleUpdate(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                _context.Set<T>().Attach(entity);
+                _context.Entry(entity).State = EntityState.Modified;
+            }
+            await Task.CompletedTask;
+        }
+
+        public async Task MultipleDelete(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                _context.Set<T>().Attach(entity);
+                _context.Entry(entity).State = EntityState.Deleted;
+            }
+            await Task.CompletedTask;
         }
     }
 }

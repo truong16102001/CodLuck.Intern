@@ -6,9 +6,13 @@ namespace P6.Infrastructure.Repository
     {
         Task Commit();
         Task Create(T entity);
-        void Delete(T entity);
-        Task<List<T>> GetAllAsync(Expression<Func<T, bool>> expression = null);
+        Task Delete(T entity);
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> expression = null);
         Task<T?> GetSingleAsync(Expression<Func<T, bool>> expression = null);
-        void Update(T entity);
+        Task Update(T entity);
+
+        Task MultipleCreate(IEnumerable<T> entities);
+        Task MultipleUpdate(IEnumerable<T> entities);
+        Task MultipleDelete(IEnumerable<T> entities);
     }
 }

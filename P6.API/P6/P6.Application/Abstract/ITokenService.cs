@@ -1,5 +1,6 @@
 ﻿using P6.Application.DTOs;
 using P6.Core.Entities;
+using System.Security.Claims;
 
 namespace P6.Application.Abstract
 {
@@ -11,5 +12,7 @@ namespace P6.Application.Abstract
         Task<ServiceResult> RefreshServiceAsync(string? refreshToken, string? action = "refresh");
         void SetCookies(string? variable, string? value, DateTime expires);
         Task<User> UpdateUserRefreshTokenAsync(User user);
+
+        Task<ClaimsPrincipal> GetPrincipalFromExpiredTokenAsync(string token);
     }
 }
