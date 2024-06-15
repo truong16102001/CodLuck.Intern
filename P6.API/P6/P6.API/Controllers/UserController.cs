@@ -81,5 +81,12 @@ namespace P6.API.Controller
             return StatusCode((int)res.StatusCode, res);
         }
 
+        [HttpPost("import")]
+        public async Task<IActionResult> Inport(List<UserSaveDTO> users)
+        {
+            var res = await _userService.InsertMultipleUserServiceAsync(users);
+            return StatusCode((int)res.StatusCode, res);
+        }
+
     }
 }
